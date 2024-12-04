@@ -1,3 +1,3 @@
-module github.com/M2kura/AoC24
+module AoC24
 
 go 1.23.3
