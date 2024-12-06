@@ -73,3 +73,16 @@ func DeepCopy(matrix [][]rune) [][]rune {
     }
     return copyMatrix
 }
+
+func RuneMatrixToFile(name string, matrix [][]rune) {
+	file, _ := os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	defer file.Close()
+	for i, row := range matrix {
+		str := ""
+		for j := range row {
+			str += string(matrix[i][j])
+		}
+		str += "\n"
+		file.WriteString(str)
+	}
+}

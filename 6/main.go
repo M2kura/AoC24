@@ -5,72 +5,90 @@ import (
 	"AoC24/utils"
 )
 
-func markThePath(matrix [][]rune) bool {
-	isOut := false
+func findCursor(matrix [][]rune) []int {
 	cursor := []rune{'^','>','v','<'}
-	for !isOut {
-		MainLoop:
-		for i, row := range matrix {
-			for j := range row {
-				if utils.ContainRune(cursor, matrix[i][j]) {
-					if matrix[i][j] == '^' {
-						if i != 0 {
-							if matrix[i-1][j] == '#' {
-								matrix[i][j] = '>'
-							} else {
-								matrix[i-1][j] = '^'
-								matrix[i][j] = 'X'
-							}
-						} else {
-							matrix[i][j] = 'X'
-							isOut = true
-							break MainLoop
-						}
-					} else if matrix[i][j] == '>' {
-						if j != len(row)-1 {
-							if matrix[i][j+1] == '#' {
-								matrix[i][j] = 'v'
-							} else {
-								matrix[i][j+1] = '>'
-								matrix[i][j] = 'X'
-							}
-						} else {
-							matrix[i][j] = 'X'
-							isOut = true
-							break MainLoop
-						}
-					} else if matrix[i][j] == 'v' {
-						if i != len(matrix)-1 {
-							if matrix[i+1][j] == '#' {
-								matrix[i][j] = '<'
-							} else {
-								matrix[i+1][j] = 'v'
-								matrix[i][j] = 'X'
-							}
-						} else {
-							matrix[i][j] = 'X'
-							isOut = true
-							break MainLoop
-						}
-					} else if matrix[i][j] == '<' {
-						if j != 0 {
-							if matrix[i][j-1] == '#' {
-								matrix[i][j] = '^'
-							} else {
-								matrix[i][j-1] = '<'
-								matrix[i][j] = 'X'
-							}
-						} else {
-							matrix[i][j] = 'X'
-							isOut = true
-							break MainLoop
-						}
-					}
-				}
+	for i, row := range matrix {
+		for j := range row {
+			if utils.ContainRune(cursor, matrix[i][j]) {
+				return []int{i, j}
 			}
 		}
 	}
-	return isOut
+	return nil
+}
+
+func makeMove(matrix [][]rune, cursorCord []int, movesCount *int) {
+	cursorRune := matrix[cursorCord[0]][cursorCord[1]]
+	if cursorRune == '^' {
+		makeMoveUp(matrix, cursorCord[0], cursorCord[1], movesCount)
+	} else if cursorRune == '>' {
+		makeMoveRight(matrix, cursorCord[0], cursorCord[1], movesCount)
+	} else if cursorRune == 'v' {
+		makeMoveDown(matrix, cursorCord[0], cursorCord[1], movesCount)
+	} else if cursorRune == '<' {
+		makeMoveLeft(matrix, cursorCord[0], cursorCord[1], movesCount)
+	}
+}
+
+func makeMoveUp(matrix [][]rune, x int, y int, movesCount *int) {
+	if x != 0 && matrix[x-1][y] == '#' {
+		matrix[x][y] = '>'
+	} else {
+		*movesCount++
+		if x != 0 {
+			matrix[x-1][y] = '^'
+		}
+		matrix[x][y] = 'X'
+	}
+}
+
+func makeMoveRight(matrix [][]rune, x int, y int, movesCount *int) {
+	if y != len(matrix[x])-1 && matrix[x][y+1] == '#' {
+		matrix[x][y] = 'v'
+	} else {
+		*movesCount++
+		if y != len(matrix[x])-1 {
+			matrix[x][y+1] = '>'
+		}
+		matrix[x][y] = 'X'
+	}
+}
+
+func makeMoveDown(matrix [][]rune, x int, y int, movesCount *int) {
+	if x != len(matrix)-1 && matrix[x+1][y] == '#' {
+		matrix[x][y] = '<'
+	} else {
+		*movesCount++
+		if x != len(matrix)-1 {
+			matrix[x+1][y] = 'v'
+		}
+		matrix[x][y] = 'X'
+	}
+}
+
+func makeMoveLeft(matrix [][]rune, x int, y int, movesCount *int) {
+	if y != 0 && matrix[x][y-1] == '#' {
+		matrix[x][y] = '^'
+	} else {
+		*movesCount++
+		if y != 0 {
+			matrix[x][y-1] = '<'
+		}
+		matrix[x][y] = 'X'
+	}
+}
+
+func markThePath(matrix [][]rune) int {
+	cursor := findCursor(matrix)
+	movesCount := 0
+	for cursor != nil {
+		makeMove(matrix, cursor, &movesCount)
+		if movesCount > 10000 {
+			return -1
+		}
+		cursor = findCursor(matrix)
+	}
+	return movesCount
 }
 
 func sumOfMarks(matrix [][]rune) int {
@@ -85,10 +103,30 @@ func sumOfMarks(matrix [][]rune) int {
 	return sum
 }
 
+func tryObstr(matrix [][]rune) int {
+	count := 0
+	for i, row := range matrix {
+		for j := range row {
+			if !(i == 79 && j == 87) && matrix[i][j] == 'X' {
+				matrixCopy := utils.StrToMatrix(utils.FileToStr("input"))
+				matrixCopy[i][j] = '#'
+				steps := markThePath(matrixCopy)
+				if steps == -1 {
+					count++
+				}
+				fmt.Printf("For block on row %d, col %d - %d steps\n", i+1, j+1, steps)
+			}
+		}
+	}
+	return count
+}
+
 func main() {
 	content := utils.FileToStr("input")
 	matrix := utils.StrToMatrix(content)
-	markThePath(matrix)
+	movesCount := markThePath(matrix)
 	sum := sumOfMarks(matrix)
 	fmt.Println(sum)
+	fmt.Println("Move coutn deffault:", movesCount, "\n-----------")
+	fmt.Println(tryObstr(matrix))
 }
