@@ -66,12 +66,12 @@ func StrToMatrix(str string) [][]rune {
 }
 
 func DeepCopy(matrix [][]rune) [][]rune {
-    copyMatrix := make([][]rune, len(matrix))
-    for i := range matrix {
-        copyMatrix[i] = make([]rune, len(matrix[i]))
-        copy(copyMatrix[i], matrix[i])
-    }
-    return copyMatrix
+	copyMatrix := make([][]rune, len(matrix))
+	for i := range matrix {
+		copyMatrix[i] = make([]rune, len(matrix[i]))
+		copy(copyMatrix[i], matrix[i])
+	}
+	return copyMatrix
 }
 
 func RuneMatrixToFile(name string, matrix [][]rune) {
@@ -85,4 +85,13 @@ func RuneMatrixToFile(name string, matrix [][]rune) {
 		str += "\n"
 		file.WriteString(str)
 	}
+}
+
+func CountDigits(num int) int {
+	count := 0 
+	for num != 0 {
+		num = num/10
+		count++
+	}
+	return count
 }
