@@ -65,6 +65,24 @@ func StrToMatrix(str string) [][]rune {
 	return matrix
 }
 
+func StrToMatrixInt(str string) [][]int {
+	matrix := [][]int{{},}
+	row, col := 0, 0
+	for i, num := range str {
+		if num == '\n' {
+			if i != len(str) - 1 {
+				matrix = append(matrix, []int{})
+			}
+			row++
+			col = 0
+		} else {
+			matrix[row] = append(matrix[row], Atoi(string(num)))
+			col++
+		}
+	}
+	return matrix
+}
+
 func DeepCopy(matrix [][]rune) [][]rune {
 	copyMatrix := make([][]rune, len(matrix))
 	for i := range matrix {
