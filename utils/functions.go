@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"strconv"
+	"regexp"
 )
 
 func FileToStr(path string) string {
@@ -112,4 +113,20 @@ func CountDigits(num int) int {
 		count++
 	}
 	return count
+}
+
+func StrToSpliceInt(str string, delimiters []rune) []int {
+	numSlice := []int{}
+	delList := "["
+	for _, d := range delimiters {
+		delList += string(d)
+	}
+	delList += "]"
+	re := regexp.MustCompile(delList)
+	strSlice := re.Split(str, -1)
+	strSlice = strSlice[:len(strSlice)-1]
+	for _, num := range strSlice {
+		numSlice = append(numSlice, Atoi(num))
+	}
+	return numSlice
 }

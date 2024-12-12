@@ -1,0 +1,43 @@
+package main
+
+import (
+	"fmt"
+	"AoC24/utils"
+	"math"
+)
+
+func blink25times(stonesRow []int) int {
+	stonesLen := len(stonesRow)
+	for i:=0; i<1; i++ {
+		for j:=0; j<stonesLen; j++ {
+			if stonesRow[j] == 0 {
+				stonesRow[j] = 1
+			} else if utils.CountDigits(stonesRow[j])%2 == 0 {
+				rightNumber := 0
+				digits := utils.CountDigits(stonesRow[j])/2
+				for k:=0;k<digits;k++{
+					fmt.Println("Right number: ", rightNumber)
+					fmt.Println("10 powered: ", int(math.Pow(10.0, float64(k))))
+					fmt.Println("lastdigit of left number: ", stonesRow[j]%10)
+					rightNumber = int(math.Pow(10.0, float64(k))) * stonesRow[j]%10 + rightNumber
+					fmt.Println("Right number: ", rightNumber)
+					stonesRow[j] /= 10
+				}
+				stonesRow = append(stonesRow[:j+1], append([]int{rightNumber}, stonesRow[j+1:]...)...)
+				stonesLen++
+				j++
+			} else {
+				stonesRow[j] *= 2024
+			}
+		}
+		fmt.Println(stonesRow)
+	}
+	return stonesLen
+}
+
+func main() {
+	delim := []rune{' ', '\n'}
+	test := utils.StrToSpliceInt("253 0 2024 14168\n", delim)
+	stonesLen2 := blink25times(test)
+	fmt.Println(stonesLen2)
+}
